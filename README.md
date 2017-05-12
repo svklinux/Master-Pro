@@ -1,3 +1,3 @@
-# Master-Pro
+# Samba
 
 Samba-Server-Settings
