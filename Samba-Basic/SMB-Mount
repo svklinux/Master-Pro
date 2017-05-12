@@ -1,0 +1,12 @@
+# mount -t cifs -o username=test,password=123456 //192.168.1.8/iso /mnt/
+# mount -t cifs -o username=test,password=123456 //192.168.1.8/iso/WiN /pdrive/
+
+
+$ sudo mkdir /smb-mnt/
+$ sudo chmod 777 /smb-mnt/
+
+$ sudo apt install cifs-utils
+$ sudo mount -t cifs //192.168.1.8/iso/LinuX/Ubuntu /smb-mnt/ -o username=test,noexec
+
+# mount -t cifs //10.10.10.101/Videos -o username=user1 /mnt/samba/videos
+# mount -t cifs //10.10.10.101/Videos -o username=user1,password=mypassword /mnt/samba/videos

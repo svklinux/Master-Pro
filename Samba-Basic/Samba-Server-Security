@@ -1,0 +1,107 @@
+Samba-Server on Ubuntu-16.04
+==============================================================
+
+# apt-get install -y samba samba-common python-glade2 system-config-samba
+
+# cp -pf /etc/samba/smb.conf /etc/samba/smb.conf.bak
+# > /etc/samba/smb.conf
+
+# vi /etc/samba/smb.conf
+[global]
+workgroup = WORKGROUP
+server string = Samba Server %v
+netbios name = UB16
+security = user
+map to guest = bad user
+dns proxy = no
+#=== Share Definitions =====
+[Public]
+path = /samba/public
+browsable =yes
+writable = yes
+guest ok = yes
+read only = no
+force user = nobody
+
+[Secured]
+path = /samba/secured
+valid users = @smbgrp
+guest ok = no
+writable = yes
+browsable = yes
+#
+
+# mkdir -p /samba/public
+# chmod -R 0775 /samba/public
+# chown -R nobody:nogroup /samba/public
+
+
+# addgroup smbgrp
+# useradd test -G smbgrp
+# smbpasswd -a test
+
+# mkdir -p /samba/secured
+# cd /samba
+# chmod -R 0770 secured
+# chown root:smbgrp secured
+
+
+# systemctl restart smbd
+# testparm
+
+
+More-Security
+-----------------------------
+
+Edit /etc/samba/smb.conf
+Add in the write list paramter to your share definition, add in your list of users allowed write access.
+You can use read only as well
+
+# vi /etc/samba/smb.conf
+
+[share]
+comment = Ubuntu Share
+path = /your/samba/share
+browsable = yes
+guest ok = yes
+read only = guest nobody
+write list = user1 user2 user3
+create mask = 0755
+#
+
+SAMBA-Advanced-Conf
+==============================================================
+
+# vim /etc/samba/smb.conf
+[global]
+server string = File Server
+workgroup = HOME-NET
+security = user
+map to guest = Bad User
+name resolve order = bcast hosts wins
+include = /etc/samba/smbshared.conf
+#
+
+# vi /etc/samba/smbshared.conf
+[Music]
+## My music collection
+path = /share/music
+public = yes
+writable = no
+[Public]
+## Public files
+path = /share/public
+create mask = 0664
+force create mode = 0664
+directory mask = 0777
+force directory mode = 0777
+public = yes
+writable = yes
+#
+
+
+# systemctl restart smbd    --Deb
+# systemctl restart smb		--Cent
+
+==============================================================
+

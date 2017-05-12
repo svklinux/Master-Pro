@@ -1,0 +1,81 @@
+
+Install and Configure Samba
+================================ 
+
+# yum install samba 
+OR
+# apt-get install samba
+
+# useradd -c "Samba_User1" -d /dev/null -s /bin/false smbu1
+# useradd -c "Samba_User1" -d /dev/null -s /bin/false smbu2
+
+# smbpasswd -a smbu1
+# smbpasswd -a smbu2
+
+# groupadd SambA
+
+# usermod -aG SambA smbu1
+# usermod -aG SambA smbu2
+
+# mkdir -p /samba/share
+# chown :SambA /samba/share
+# chmod 775 /samba/share
+
+(Here Files created by smbu1 cann't delete files of smbu2 on "/samba/share" Directory and vice versa)
+
+# vi /etc/samba/smb.conf
+[global]
+workgroup = WORKGROUP
+security = user
+[ShaRe]
+path = /samba/share
+valid users = smbu1, smbu2
+read only = no
+guest ok = no
+;instructs samba to allow this share to be displayed on the client network browser.
+browsable = yes 
+#
+
+For-Ubuntu
+
+# systemctl restart smbd
+# systemctl enable smbd
+
+For-CentOS
+
+# systemctl restart smb
+# systemctl enable smb
+
+# testparm
+
+-----------------------------
+
+Remember that your user must have permission to write and edit the folder you want to share.
+
+For Ubuntu--->Also hide the user on the login screen and allow manual Login adjusting lightdm's configuration
+
+# vi /etc/lightdm/lightdm.conf.d/50-myconfig.conf 
+[SeatDefaults]
+allow-guest=false
+greeter-hide-users=true
+greeter-show-manual-login=true
+#
+
+-----------------------------
+
+
+Allow Samba Through FireWall Rules
+================================
+
+# firewall-cmd --list-all
+# firewall-cmd --get-services ---> To get the names of pre-defined services ( Name "samba" will be there)
+
+# firewall-cmd --add-service=samba --permanent
+# systemctl restart firewalld
+
+# cat /usr/lib/firewalld/services/samba.xml  ---> For Samba Ports Description
+
+
+
+
+
