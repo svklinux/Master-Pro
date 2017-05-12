@@ -1,0 +1,104 @@
+Take-Software-BackUP-on-Running-Server-11-MaY-2017
+===================================================
+
+1-DB-List
+-------------------
+
+Enter the name of the databases in a file
+
+# vi /svk/scripts/dblist.txt
+dbname-1
+dbname-2  
+testdb
+demodb
+#
+
+2-DB-Password
+-------------------
+
+Enter the password for the dbuser to take backup from DB
+
+
+# vi /svk/scripts/.pg-passwd
+adminxxxx
+#
+
+
+3-Script-to-Crate-BackUP
+-------------------
+
+Create a script to Backup above listed db's and add to crontab
+Change the "custom addon" path accordingly on script
+
+# vi /svk/scripts/backup-odoo.sh
+#!/bin/bash
+########DB-Bckup-OdooRDS-MaY-2017########
+# Stop ERP Server
+#/etc/init.d/odoo-server stop
+sleep 2
+#for db_name in test1 testdb2 
+for db_name in $(cat /svk/scripts/dblist.txt)
+do
+bkpdate=$(date +"%Y-%b-%d")
+backupdate=$(date +"%Y-%h-%d-%I%p")
+backdir=$db_name-$backupdate
+#backdir=/tmp/$db_name-$backupdate
+mkdir /tmp/$backdir
+sleep 2
+chmod 777 /tmp/$backdir
+fls_loc=$(find /opt/odoo* -type d -name $db_name)
+addon_dir=/opt/odoo/custom/addons/
+#export PGPASSWORD="$put_here_the_password"
+export PGPASSWORD=$(cat /svk/scripts/.pg-passwd)
+pg_dump -U odoobi -h odoo-pgsql-xxxxxxxxxx.rds.amazonaws.com -E UTF-8 -d $db_name --format=p -b -O -f /tmp/$backdir/$db_name.dump
+# su - postgres -c "pg_dump -E UTF-8 -F p -b -f /tmp/$backdir/$db_name.sql $db_name"
+#############################
+sleep 3
+# Dump Filestore
+cp -r $fls_loc  /tmp/$backdir
+sleep 3
+#############################
+sleep 3
+###CoPy custom addons
+cp -r $addon_dir /tmp/$backdir
+#############################
+if [ ! -f /usr/bin/zip ]
+then
+   echo -e "\e[1;91mThe Package ZIP Does Not Exist and Installing\e[0m "
+   apt-get install -y zip
+fi
+cd /tmp/
+zip -r $backdir.zip $backdir/*
+sleep 2
+[ -d /svk/BackUP/$bkpdate ] || mkdir -p /svk/BackUP/$bkpdate
+cp -r /tmp/$backdir.zip /svk/BackUP/$bkpdate
+sleep 2
+rm -rf /tmp/$backdir
+rm -rf /tmp/$backdir.zip
+done
+sleep 2
+###Delete-BackUP-Files-Older-Than-4-days#######
+find /svk/BackUP/* -type d -ctime +4 | xargs rm -rf
+# Start OpenERP Server
+#/etc/init.d/odoo-server start
+sleep 2
+exit 0
+#
+
+
+BackUp script will run on 06:05 AM 
+
+# crontab -e
+...
+05 06 * * *	/bin/bash /svk/scripts/backup-odoo.sh | tee /svk/bkp-log.txt
+#
+
+# crontab -l ----> varify cron
+
+# systemctl restart cron
+
+Now the backup will be availbe on directory "/svk/BackUP/" ,and will keep only last 5 backups
+
+
+===================================================
+

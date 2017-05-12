@@ -1,0 +1,57 @@
+Rsync-BackUp-Data-to-LocalMachine-11-MaY-2017
+============================================== 
+
+Copy the backups of /svk/BackUP/ from remote-server to LocalMachine
+
+---------------
+Here the LocalMachine can login to remote-server without password using ssh-private-key
+On LocalMachine ,Copy the remote server private key to path /Test/ssh-keys and 
+change permission to "400",then edit the ~/.ssh/config file
+
+# vi .ssh/config 
+Host *
+  ServerAliveInterval 30
+  ServerAliveCountMax 5
+Host remote-server-1
+HostName <Remote-Server-IP>
+User ubuntu 
+IdentityFile "/Test/ssh-keys/remote-server-1.pem"
+#
+---------------
+
+1-Create-Script-to-copy-backup-from-server
+-------------------------------------------
+
+# vi /svk/scripts/aws-db-backup-rsync.sh
+#!/bin/bash
+##BackUP-Using-SSH-PrivateKey-(11-MaY-2017)
+d1=/Test/db-backup/remote-server-1
+bkp_mnt=$(date +%b-%Y)
+bkp_src=$(date +"%Y-%b-%d")
+bkp_dest=$d1/$bkp_mnt
+[ -d $bkp_dest ] || mkdir -p $bkp_dest
+sleep 2
+touch $d1/rsynclog_$bkp_mnt
+sleep 2
+rsync_log=$d1/rsynclog_$bkp_mnt
+echo $(date) >> $rsync_log
+echo "===================================================================" >> $rsync_log
+sleep 2
+rsync -e "ssh" -avzh remote-server-1:/svk/BackUP/$bkp_src $bkp_dest 1>>$rsync_log 2>&1
+sleep 5
+echo "===================================================================" >> $rsync_log
+#
+
+2-Add-to-Cron
+-------------------------------------------
+
+# crontab -e
+# m h  dom mon dow   command
+###Run The script on 2:00PM on every 5 days (5,10,15,..30)
+00 14 5-30/5 * * /bin/bash /svk/scripts/aws-db-backup-rsync.sh
+#
+
+# systemctl restart cron
+
+==============================================
+

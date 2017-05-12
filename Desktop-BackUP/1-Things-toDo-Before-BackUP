@@ -1,0 +1,54 @@
+BackUP-Using-RSYNC-with-SSH-PrivateKey(11-MaY-2017)
+=======================================================
+
+Source(Client)		==OS-Ubuntu16.04, IP-192.168.1.222, Path=/home/ubadmin/Desktop/
+Destination(Server)	==OS-CentOS6.5, IP-192.168.1.8, Path=/root/UBT-Desktop/Desktop/
+
+ServerIP==100.0.0.10
+ClientIP==100.0.0.50
+
+1.Generate SSH-Private-Key 
+-----------------------------------------------------
+
+Generate SSH-Private-Key on Ubuntu Machine and copy to CentOS
+
+$ ssh-keygen
+
+Add/Append generated Public key to "authorized_keys"file
+
+$ cat ~/.ssh/id_rsa.pub >> authorized_keys
+$ chmod 600 authorized_keys
+
+Copy Private key to CentOS System 
+
+$ scp id_rsa root@192.168.1.8:/tmp
+$ sudo vi /etc/ssh/sshd_config
+...
+RSAAuthentication yes
+PubkeyAuthentication yes
+AuthorizedKeysFile      .ssh/authorized_keys
+...
+$
+
+$ sudo service sshd restart
+$ exit
+
+Do the following steps on Destination-Machine(CentOS)
+
+2.From CentOS  Login to Ubuntu
+-----------------------------------------------------
+
+# mkdir -p /root/UBT-Desktop/RSYNC
+# mv /tmp/id_rsa /root/UBT-Desktop/RSYNC/ubadmin_key
+# chmod 400 /root/UBT-Desktop/RSYNC/ubadmin_key
+# ssh -i /root/UBT-Desktop/RSYNC/ubadmin_key ubadmin@192.168.1.222
+
+3.Create Directories for BackUP and Log Files
+-----------------------------------------------------
+
+# mkdir -p /root/UBT-Desktop/Desktop/
+# mkdir -p /root/UBT-Desktop/F-Backup
+# mkdir -p /root/UBT-Desktop/RSYNC/logs
+
+=======================================================
+

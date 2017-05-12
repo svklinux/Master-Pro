@@ -1,0 +1,53 @@
+Desktop-BackUP-Script-11-May-2017
+========================================================= 
+
+Create the below script to take backup and add to cron on CentOS
+Also script will take a full backup on 3rd of every month 
+
+Source		==OS-Ubuntu16.04, IP-192.168.1.222, Path=/home/ubadmin/Desktop/
+Destination	==OS-CentOS6.5, IP-192.168.1.8, Path=/root/UBT-Desktop/Desktop/
+
+
+# vi /root/UBT-Desktop/RSYNC/Backup.sh
+#!/bin/bash
+[ -d /root/UBT-Desktop/RSYNC/logs ] || mkdir -p /root/UBT-Desktop/RSYNC/logs
+sleep 2
+test=$(date +%F|awk -F"-" '{print $3}')
+backupdate=$(date +%Y-%b-%d-%I%p)
+touch /root/UBT-Desktop/RSYNC/logs/rsynclog_$backupdate
+rsync_log=/root/UBT-Desktop/RSYNC/logs/rsynclog_$backupdate
+echo $(date) >> $rsync_log
+echo "============================" >> $rsync_log
+rsync -e "ssh -i /root/UBT-Desktop/RSYNC/ubadmin_key" -avzh --delete ubadmin@192.168.1.222:/home/ubadmin/Desktop/* /root/UBT-Desktop/Desktop/ 1>>$rsync_log 2>&1 
+echo "============================" >> $rsync_log
+
+###Take Full BackUP on 3rd of every month### 
+#########
+if [ $test == 03 ]
+then
+	[ -d /root/UBT-Desktop/Full-Backup ] || mkdir -p /root/UBT-Desktop/Full-Backup
+	sleep 2
+	touch /root/UBT-Desktop/Full-Backup/bpklog_$backupdate
+	backup_dir=Desktop
+	back_log=/root/UBT-Desktop/Full-Backup/bpklog_$backupdate
+	backup_file=Desktop-$backupdate.tar.bz2
+	echo $(date) >> $back_log
+	echo "============================" >>$back_log
+    	cd /root/UBT-Desktop/Full-Backup
+	tar cvfjP $backup_file ../$backup_dir/* 1>>$back_log 2>&1 
+	echo "============================" >>$back_log
+fi
+##########
+#
+
+Add the script to cron to run on 4:10PM on every day
+
+# crontab -e
+...
+10 16 * * *     /bin/bash /root/UBT-Desktop/RSYNC/Backup.sh &> /root/UBT-Desktop/RSYNC/cron.log && echo $(date) >> /root/UBT-Desktop/RSYNC/cron.log
+#
+# service crond restart
+
+Check the timestamp or cat the file "/root/UBT-Desktop/RSYNC/cron.log" for checking cronjob
+
+=========================================================
