@@ -1,2 +1,3 @@
-# RSYNC-Project-SVK 
+# RSYNC
+ 
 BackUP using RSYNC
