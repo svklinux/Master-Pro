@@ -1,0 +1,10 @@
+
+# grep -ir "You need to sign in or sign up before continuing." /opt/gitlab/
+
+# vi /opt/gitlab/embedded/service/gitlab-rails/config/locales/devise.en.yml
+...
+unauthenticated: "You need to sign in before continuing."
+...
+# 
+
+# gitlab-ctl restart

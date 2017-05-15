@@ -1,0 +1,78 @@
+
+Configure-MailSupport-on-GitLab
+===================================
+
+If you want to use Gmail / Google Apps with Reply by email, make sure you have IMAP access enabled 
+and allowed less secure apps to access the account.
+
+------> https://support.google.com/mail/answer/7126229?hl=en&visit_id=0-636167086613709422-1781044374&rd=1#ts=1665018
+------> https://support.google.com/accounts/answer/6010255
+
+
+To set up a basic Postfix mail server with IMAP access on Ubuntu, 
+follow these instructions.
+
+
+# vi /etc/gitlab/gitlab.rb
+external_url 'http://192.168.1.12'
+gitlab_rails['incoming_email_enabled'] = true
+gitlab_rails['incoming_email_address'] = "gittest+%{key}@gmail.com"
+gitlab_rails['incoming_email_email'] = "gittest@gmail.com"
+gitlab_rails['incoming_email_password'] = "test1234"
+gitlab_rails['incoming_email_host'] = "imap.gmail.com"
+gitlab_rails['incoming_email_port'] = 993
+gitlab_rails['incoming_email_ssl'] = true
+gitlab_rails['incoming_email_start_tls'] = false
+gitlab_rails['incoming_email_mailbox_name'] = "inbox"
+gitlab_rails['incoming_email_idle_timeout'] = 60
+gitlab_rails['smtp_enable'] = true
+gitlab_rails['smtp_address'] = "smtp.gmail.com"
+gitlab_rails['smtp_port'] = 587
+gitlab_rails['smtp_user_name'] = "gittest@gmail.com"
+gitlab_rails['smtp_password'] = "test1234"
+gitlab_rails['smtp_domain'] = "smtp.gmail.com"
+gitlab_rails['smtp_authentication'] = "login"
+gitlab_rails['smtp_enable_starttls_auto'] = true
+gitlab_rails['smtp_tls'] = false
+gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+#
+
+Reconfigure GitLab and restart mailroom for the changes to take effect:
+
+$ sudo gitlab-ctl reconfigure
+$ sudo gitlab-ctl restart mailroom
+
+Verify that everything is configured correctly:
+
+$ sudo gitlab-rake gitlab:incoming_email:check
+
+Reply by email should now be working.
+
+
+Testing the SMTP configuration
+
+You can verify GitLab's ability to send emails properly using the Rails console. On the GitLab server, execute gitlab-rails console to enter the console. Then, you can enter the following command at the console prompt to cause GitLab to send a test email:
+
+# gitlab-rails console
+> Notify.test_email('gittest@gmail.com', 'Message Subject', 'Message Body').deliver_now
+> Notify.test_email('user1@example.com', 'Message Subject', 'Message Body').deliver_now
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

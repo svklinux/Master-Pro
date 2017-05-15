@@ -1,0 +1,95 @@
+Install GitLab on Ubuntu-16.04
+==============================
+
+1. Install and configure the necessary dependencies 
+
+$ sudo apt-get install curl openssh-server ca-certificates postfix
+
+2. Add the GitLab package server and install the package 
+
+$ curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+$ sudo apt-get install gitlab-ce
+
+3. Configure and start GitLab 
+
+$ sudo gitlab-ctl reconfigure
+need to configure the domain name in the configuration file so you can access GitLab. Open the file.
+
+$ sudo vi  /etc/gitlab/gitlab.rb
+
+In this file edit the 'external_url' and give the server domain. Save the file and then open the newly created GitLab site from a web browser.
+Now open browser and type "Local IP of Server (200.0.0.30)"
+
+4. Browse to the hostname/IP-Address and login
+
+On your first visit, you'll be redirected to a password reset screen to provide the password for the initial administrator account. Enter your desired password and you'll be redirected back to the login screen.
+The default account's username is root. Provide the password you created earlier and login. After login you can change the username if you wish.(
+(For-Old-Release---By default it creates 'root' as the system admin and uses '5iveL!fe' as the password. Log into the GitLab site and then change the password.)
+
+From GUI create additional user(gitadmin) and Project/Repo named as TesT add a file and add some text and commit
+Now git Local Git Server is Ready to work
+
+Do some Testing
+
+
+From Client  clone remote repo,create new branch  and make changes and pull to new branch
+=====================================================================================
+
+Log in as any user
+
+$ git clone http://200.0.0.30/gitadmin/TestT.git
+
+$ cd TestT
+$ git status
+$ ls -la
+
+
+$ git config --list
+$ git config --global user.name "tester"
+$ git config --global user.email "tester@test.com"
+$ git config --list
+
+
+$ git checkout -b pro1
+$ mkdir wall
+$ cp /home/ubuntu/Downloads/FireFox/4*.jpg wall/
+$ ls wall/
+$ cp /home/ubuntu/Downloads/FireFox/Git-VCS.pdf .
+
+$ git status
+
+$ git add .
+$ git commit -m "Addes Files from 200.0.0.10"
+$ git status
+
+$ git remote -v
+
+$ git push origin pro1
+
+Username for 'http://200.0.0.30': 				gitadmin
+Password for 'http://gitadmin@200.0.0.30': 	*********
+Counting objects: 9, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (8/8), 13.96 MiB | 1.08 MiB/s, done.
+Total 8 (delta 0), reused 0 (delta 0)
+To http://200.0.0.30/gitadmin/TestT.git
+ * [new branch]      pro1 -> pro1
+$
+
+$ git checkout master
+$ ls
+
+(Newly added files only found on that particular branch only)
+
+
+
+
+
+
+
+
+
+
+
+

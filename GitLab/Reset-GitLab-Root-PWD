@@ -1,0 +1,11 @@
+
+Reset-Gitlab-Root-Password
+==============================
+
+# gitlab-rails console production
+irb(main):001:0> u = User.where(id:1).first
+irb(main):002:0> u.password = 'root@123'
+irb(main):003:0> u.password_confirmation = 'root@123'
+irb(main):004:0> u.save!
+irb(main):005:0> exit
+#

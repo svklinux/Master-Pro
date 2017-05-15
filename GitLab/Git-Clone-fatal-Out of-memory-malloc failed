@@ -1,0 +1,26 @@
+
+Git Clone Error---fatal: Out of memory, malloc failed 
+=======================================================
+
+Add swap memory in server OR increase RAM of Server
+
+# fallocate -l 4G /swapfile
+# chmod 600 /swapfile
+# mkswap /swapfile
+# swapon /swapfile
+
+Make these changes permanent by adding to /etc/fstab:
+
+# vi /etc/fstab
+...
+/swapfile   none    swap    sw    0   0
+#
+
+
+Recommend adding to /etc/sysctl.conf:
+
+# vi /etc/sysctl.conf
+...
+vm.swappiness=10
+vm.vfs_cache_pressure = 50
+#

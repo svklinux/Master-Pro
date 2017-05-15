@@ -1,3 +1,3 @@
 # SVK-LinuX
 
-	Git-RePo
+	GitLab-TiPS

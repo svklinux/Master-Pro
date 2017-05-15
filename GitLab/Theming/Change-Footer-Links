@@ -1,0 +1,19 @@
+
+To Change Links in Footer(Explore,Help,AboutGitlab) edit "devise.html.haml" file
+
+# cd /opt/gitlab/embedded/service/gitlab-rails/app/views/layouts
+# grep gitlab.com *
+
+# vi /opt/gitlab/embedded/service/gitlab-rails/app/views/layouts/devise.html.haml
+...
+      %hr.footer-fixed
+      .container.footer-container
+        .footer-links
+          = link_to "Explore", explore_root_path
+          = link_to "Help", help_path
+          = link_to "About LiGS", "http://ligs.in/"
+#
+
+# 
+
+# gitlab-ctl restart
